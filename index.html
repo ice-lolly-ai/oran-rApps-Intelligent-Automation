@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>O-RAN Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>O-RAN Dashboard</h1>
+    <canvas id="myChart" width="400" height="200"></canvas>
+    
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Signal Strength vs Traffic Load',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        
+        function updateChart(data) {
+            myChart.data.labels.push(data.signal_strength.toFixed(2));
+            myChart.data.datasets[0].data.push(data.traffic_load.toFixed(2));
+            myChart.update();
+        }
+        
+        function fetchData() {
+            fetch('http://localhost:5000/data')
+                .then(response => response.json())
+                .then(data => updateChart(data))
+                .catch(error => console.error('Error:', error));
+        }
+        
+        setInterval(fetchData, 1000);  // Fetch data every second
+    </script>
+</body>
+</html>
